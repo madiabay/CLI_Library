@@ -14,7 +14,7 @@ class BookHandler:
     def __init__(self, book_repository: BookRepositoryInterface):
         self.book_repository = book_repository
 
-    def add_book(self, title: str, author: str, year: str) -> dict:
+    def add_book(self, title: str, author: str, year: str) -> tuple[dict, Book]:
         """Process and validate book addition request."""
         if not year.isdigit() or len(year) != 4:
             raise InvalidYearFormat

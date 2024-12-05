@@ -33,7 +33,7 @@ def main():
             match command.capitalize():
                 case '1' | 'Add book':
                     book_data = get_book_data_from_request()
-                    response_dict = book_handler.add_book(**book_data)
+                    response_dict, _ = book_handler.add_book(**book_data)
                 case '2' | 'Remove book':
                     book_id = get_book_id_for_delete()
                     response_dict = book_handler.remove_book(book_id=book_id)

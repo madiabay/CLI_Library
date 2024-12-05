@@ -10,28 +10,24 @@ from books.exceptions import BookAlreadyExists
 class BookRepositoryInterface(Protocol):
     """The Interface for BookRepository."""
 
-    @staticmethod
-    def add_book(title: str, author: str, year: int) -> dict:
+    DATABASE_FILE: str
+    def add_book(self, title: str, author: str, year: int) -> tuple[dict, Book]:
         """Add a new book to the library."""
         raise NotImplementedError
 
-    @staticmethod
-    def get_books() -> tuple[dict, List[Book]]:
+    def get_books(self) -> tuple[dict, List[Book]]:
         """Retrieve all books from the library."""
         raise NotImplementedError
 
-    @staticmethod
-    def delete_book(book_id: str) -> dict:
+    def delete_book(self, book_id: str) -> dict:
         """Delete a book from the library."""
         raise NotImplementedError
 
-    @staticmethod
-    def search_books(query_string: str) -> tuple[dict, List[Book]]:
+    def search_books(self, query_string: str) -> tuple[dict, List[Book]]:
         """Search for books matching the query string."""
         raise NotImplementedError
 
-    @staticmethod
-    def change_book_status(book_id: str, book_status: BookStatus) -> dict:
+    def change_book_status(self, book_id: str, book_status: BookStatus) -> dict:
         """Change the status of a book."""
         raise NotImplementedError
 
@@ -39,36 +35,36 @@ class BookRepositoryInterface(Protocol):
 class BookRepository:
     """Implementation of the BookRepositoryInterface using JSON file storage."""
 
-    @staticmethod
-    def add_book(title: str, author: str, year: int) -> dict:
-        if os.path.getsize('database.json') == 0:
+    DATABASE_FILE: str = 'database.json'
+
+    def add_book(self, title: str, author: str, year: int) -> tuple[dict, Book]:
+        if os.path.getsize(self.DATABASE_FILE) == 0:
             books = []
         else:
-            with open('database.json', 'r') as file:
+            with open(self.DATABASE_FILE, 'r') as file:
                 books = json.load(file)
 
         for book in books:
             if book['title'] == title and book['author'] == author and book['year'] == year:
                 raise BookAlreadyExists
-        book = Book(title=title, author=author, year=year)
+        created_book = Book(title=title, author=author, year=year)
 
         books.append(
             {
-                "id": str(book.id),
-                "title": book.title,
-                "author": book.author,
-                "year": book.year,
-                "status": book.status.value,
+                "id": str(created_book.id),
+                "title": created_book.title,
+                "author": created_book.author,
+                "year": created_book.year,
+                "status": created_book.status.value,
             }
         )
-        with open('database.json', 'w') as file:
+        with open(self.DATABASE_FILE, 'w') as file:
             json.dump(books, file, indent=4)
 
-        return {'message': f"Book successfully added", 'status_code': 201}
+        return {'message': f"Book successfully added", 'status_code': 201}, created_book
 
-    @staticmethod
-    def delete_book(book_id: str) -> dict:
-        with open('database.json', 'r') as file:
+    def delete_book(self, book_id: str) -> dict:
+        with open(self.DATABASE_FILE, 'r') as file:
             books = json.load(file)
 
         original_length = len(books)
@@ -77,14 +73,13 @@ class BookRepository:
         if original_length == len(books):
             raise ValueError(f"Book with id {book_id} not found")
 
-        with open('database.json', 'w') as file:
+        with open(self.DATABASE_FILE, 'w') as file:
             json.dump(books, file, indent=4)
 
         return {'message': f"Book with {book_id=} successfully deleted", 'status_code': 204}
 
-    @staticmethod
-    def search_books(query_string: str) -> tuple[dict, List[Book]]:
-        with open('database.json', 'r') as file:
+    def search_books(self, query_string: str) -> tuple[dict, List[Book]]:
+        with open(self.DATABASE_FILE, 'r') as file:
             books = json.load(file)
 
         def matches_book(book: dict) -> bool:
@@ -100,16 +95,14 @@ class BookRepository:
             [book for book in books if matches_book(book)],
         )
 
-    @staticmethod
-    def get_books() -> tuple[dict, List[Book]]:
-        with open('database.json', 'r') as file:
+    def get_books(self) -> tuple[dict, List[Book]]:
+        with open(self.DATABASE_FILE, 'r') as file:
             books = json.load(file)
 
         return {'message': 'All books received', 'status_code': 200}, books
 
-    @staticmethod
-    def change_book_status(book_id: str, book_status: BookStatus) -> dict:
-        with open('database.json', 'r') as file:
+    def change_book_status(self, book_id: str, book_status: BookStatus) -> dict:
+        with open(self.DATABASE_FILE, 'r') as file:
             books = json.load(file)
 
         for book in books:
@@ -119,7 +112,7 @@ class BookRepository:
         else:
             raise ValueError(f"Book with id {book_id} not found")
 
-        with open('database.json', 'w') as file:
+        with open(self.DATABASE_FILE, 'w') as file:
             json.dump(books, file, indent=4)
 
         return {'message': f"Book's status updated", 'status_code': 200}
