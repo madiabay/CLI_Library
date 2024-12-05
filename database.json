@@ -2,7 +2,7 @@
     {
         "id": "dc751817-9bd3-4f22-ab9e-e4946274cf30",
         "title": "harry potter",
-        "author": "rouley",
+        "author": "rowling",
         "year": 2002,
         "status": "BORROWED"
     },
@@ -14,24 +14,10 @@
         "status": "BORROWED"
     },
     {
-        "id": "a9b41566-d95c-4bb8-9c7d-518971332923",
-        "title": "2012",
-        "author": "EEE",
-        "year": "2001",
-        "status": "AVAILABLE"
-    },
-    {
         "id": "3d603e1b-8579-4ba7-b571-dfdf2157e923",
-        "title": "zhaksylyk",
-        "author": "stom",
+        "title": "the zen of python",
+        "author": "SomeOne",
         "year": "2012",
-        "status": "AVAILABLE"
-    },
-    {
-        "id": "de9a3b1c-f829-4cad-9db8-8c4fbf441916",
-        "title": "ter",
-        "author": "dfg",
-        "year": 2015,
         "status": "AVAILABLE"
     }
 ]
